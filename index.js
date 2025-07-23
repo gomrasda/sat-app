@@ -32,3 +32,5 @@ app.listen(PORT, () => {
 
 require('./crearAdmin')();
 app.use('/auth', require('./auth'));
+app.use('/avisos', require('./avisos'));
+app.use('/usuarios', require('./usuarios'));
