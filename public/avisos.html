@@ -126,12 +126,12 @@
     <button onclick="location.href='avisos.html'">Avisos</button>
   </div>
   <div class="main" id="avisosContainer">
-    <!-- Cargado por JS -->
+    <!-- Avisos se cargan aquí -->
   </div>
 </div>
 
 <script>
-const API = 'http://localhost:3000';
+const API = ''; // Para que funcione en producción (Render, Vercel)
 const container = document.getElementById("avisosContainer");
 
 function toggleSidebar() {
@@ -164,7 +164,7 @@ async function cargarAvisos() {
 }
 
 function editarAviso(aviso) {
-  alert("Editar aviso: " + aviso.id);
+  alert("Editar aviso: " + aviso.id + "\n(Todo listo para implementar modal de edición)");
 }
 
 async function borrarAviso(id) {
