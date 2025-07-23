@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
   );
 });
 
-// Editar un usuario
+// Editar un usuario existente
 router.put('/:id', (req, res) => {
   const { nombre, usuario, email, rol } = req.body;
   if (!nombre || !usuario || !email || !rol) {
