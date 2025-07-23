@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -84,173 +85,134 @@
       margin-right: 6px;
       margin-top: 5px;
     }
-    .rol {
-      background: #3498db;
-      color: white;
-    }
-    .actions button {
+    .action-btn {
+      padding: 6px 12px;
       margin-right: 5px;
-      padding: 6px 10px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    .actions .edit { background: #27ae60; color: white; }
-    .actions .delete { background: #e74c3c; color: white; }
+    .edit { background: #3498db; color: white; }
+    .delete { background: #e74c3c; color: white; }
     .add-btn {
-      margin-bottom: 12px;
-      background: #2ecc71;
+      background: #28a745;
       color: white;
       padding: 8px 12px;
+      margin-bottom: 10px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
-    #modal, #overlay {
-      display: none;
+    #overlay {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
     }
     #modal {
       background: white;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       width: 90%;
       max-width: 400px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
     }
-    #overlay {
-      background: rgba(0, 0, 0, 0.3);
+    input, select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <button class="hamburguesa" onclick="toggleSidebar()">☰</button>
-    <h1>Usuarios</h1>
-  </header>
-  <div class="container">
-    <div class="sidebar" id="sidebar">
-      <h3>SAT Control</h3>
-      <button onclick="location.href='index.html'">Inicio</button>
-      <button onclick="location.href='usuarios.html'">Usuarios</button>
-      <button onclick="location.href='clientes.html'">Clientes</button>
-      <button onclick="location.href='avisos.html'">Avisos</button>
-      <button onclick="location.href='tickets.html'">Tickets</button>
-    </div>
-    <div class="main" id="usuariosContainer">
-      <button class="add-btn" onclick="abrirModalNuevo()">➕ Agregar Usuario</button>
-      <!-- Cargado por JS -->
-    </div>
+<header>
+  <button class="hamburguesa" onclick="toggleSidebar()">☰</button>
+  <h1>Usuarios</h1>
+</header>
+<div class="container">
+  <div class="sidebar" id="sidebar">
+    <h3>SAT Control</h3>
+    <button onclick="location.href='index.html'">Inicio</button>
+    <button onclick="location.href='usuarios.html'">Usuarios</button>
+    <button onclick="location.href='clientes.html'">Clientes</button>
+    <button onclick="location.href='avisos.html'">Avisos</button>
+    <button onclick="location.href='tickets.html'">Tickets</button>
   </div>
+  <div class="main" id="usuariosContainer">
+    <button class="add-btn" onclick="abrirModal()">➕ Agregar Usuario</button>
+  </div>
+</div>
 
-  <!-- Modal -->
-  <div id="modal">
-    <h3 id="modal-title">Editar Usuario</h3>
-    <input id="inputNombre" placeholder="Nombre" style="width:100%; margin-bottom:8px;" />
-    <input id="inputUsuario" placeholder="Usuario" style="width:100%; margin-bottom:8px;" />
-    <input id="inputEmail" placeholder="Email" style="width:100%; margin-bottom:8px;" />
-    <input id="inputRol" placeholder="Rol" style="width:100%; margin-bottom:8px;" />
+<div id="overlay" onclick="cerrarModal()">
+  <div id="modal" onclick="event.stopPropagation()">
+    <h3>Nuevo Usuario</h3>
+    <input type="text" id="nombre" placeholder="Nombre"/>
+    <input type="text" id="usuario" placeholder="Usuario"/>
+    <input type="email" id="email" placeholder="Email"/>
+    <input type="text" id="rol" placeholder="Rol"/>
     <div style="text-align:right;">
-      <button onclick="guardarCambios()">Guardar</button>
+      <button onclick="guardarUsuario()">Guardar</button>
       <button onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
-  <div id="overlay" onclick="cerrarModal()"></div>
+</div>
 
 <script>
-const API = '';
-let usuarioActual = null;
-let esNuevo = false;
+const API = 'https://sat-app-i3p9.onrender.com';
+const container = document.getElementById("usuariosContainer");
 
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
 }
 
-async function cargarUsuarios() {
-  const res = await fetch(API + '/usuarios');
-  const data = await res.json();
-  const container = document.getElementById("usuariosContainer");
-  container.querySelectorAll('.card').forEach(e => e.remove());
-  data.forEach(u => {
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <div><strong>${u.nombre}</strong> (${u.usuario})</div>
-      <div>Email: ${u.email}</div>
-      <span class="badge rol">${u.rol}</span>
-      <div class="actions" style="margin-top: 10px;">
-        <button class="edit" onclick='abrirModal(${JSON.stringify(u)})'>✏️ Editar</button>
-        <button class="delete" onclick="eliminarUsuario(${u.id})">🗑️ Borrar</button>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function abrirModal(usuario) {
-  usuarioActual = usuario;
-  esNuevo = false;
-  document.getElementById("modal-title").innerText = "Editar Usuario";
-  document.getElementById("inputNombre").value = usuario.nombre;
-  document.getElementById("inputUsuario").value = usuario.usuario;
-  document.getElementById("inputEmail").value = usuario.email;
-  document.getElementById("inputRol").value = usuario.rol;
-  document.getElementById("modal").style.display = "block";
-  document.getElementById("overlay").style.display = "block";
-}
-
-function abrirModalNuevo() {
-  usuarioActual = null;
-  esNuevo = true;
-  document.getElementById("modal-title").innerText = "Nuevo Usuario";
-  document.getElementById("inputNombre").value = "";
-  document.getElementById("inputUsuario").value = "";
-  document.getElementById("inputEmail").value = "";
-  document.getElementById("inputRol").value = "";
-  document.getElementById("modal").style.display = "block";
-  document.getElementById("overlay").style.display = "block";
+function abrirModal() {
+  document.getElementById("overlay").style.display = "flex";
 }
 
 function cerrarModal() {
-  document.getElementById("modal").style.display = "none";
   document.getElementById("overlay").style.display = "none";
 }
 
-async function guardarCambios() {
-  const data = {
-    nombre: document.getElementById("inputNombre").value,
-    usuario: document.getElementById("inputUsuario").value,
-    email: document.getElementById("inputEmail").value,
-    rol: document.getElementById("inputRol").value
-  };
+async function cargarUsuarios() {
+  const res = await fetch(API + '/usuarios');
+  const data = await res.json();
+  container.querySelectorAll('.card').forEach(c => c.remove());
+  data.forEach(u => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <strong>${u.nombre}</strong> (${u.usuario})<br/>
+      ${u.email} <br/>
+      <span class="badge">${u.rol}</span><br/>
+      <button class="action-btn edit" onclick="alert('Editar próximamente')">✏️ Editar</button>
+      <button class="action-btn delete" onclick="borrarUsuario(${u.id})">🗑️ Borrar</button>
+    `;
+    container.appendChild(card);
+  });
+}
 
-  if (esNuevo) {
-    await fetch('/usuarios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  } else {
-    await fetch('/usuarios/' + usuarioActual.id, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  }
+async function guardarUsuario() {
+  const nombre = document.getElementById("nombre").value;
+  const usuario = document.getElementById("usuario").value;
+  const email = document.getElementById("email").value;
+  const rol = document.getElementById("rol").value;
+
+  const res = await fetch(API + '/usuarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, usuario, email, rol })
+  });
   cerrarModal();
   cargarUsuarios();
 }
 
-async function eliminarUsuario(id) {
-  if (confirm("¿Borrar usuario #" + id + "?")) {
-    await fetch('/usuarios/' + id, { method: 'DELETE' });
+async function borrarUsuario(id) {
+  if (confirm("¿Eliminar este usuario?")) {
+    await fetch(API + '/usuarios/' + id, { method: 'DELETE' });
     cargarUsuarios();
   }
 }
