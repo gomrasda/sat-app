@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,7 +7,6 @@
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f2f2f2; display: flex; flex-direction: column; height: 100vh; }
     header { background: #0a3d62; color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
-    header h1 { font-size: 18px; margin: 0; }
     .hamburguesa { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
     .container { flex: 1; display: flex; flex-direction: row; }
     .sidebar { width: 200px; background: #343a40; color: #fff; padding: 15px; display: none; flex-direction: column; }
@@ -19,6 +17,13 @@
       .hamburguesa { display: none; }
     }
     .main { flex: 1; padding: 10px; overflow-y: auto; }
+    .card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card h3 { margin-top: 0; }
+    label { display: block; margin-top: 8px; font-weight: bold; }
+    input, select { width: 100%; padding: 6px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
+    button.action { padding: 6px 12px; margin-right: 5px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    .edit { background: #3498db; color: white; }
+    .delete { background: #e74c3c; color: white; }
   </style>
 </head>
 <body>
@@ -36,15 +41,88 @@
     <button onclick="location.href='tickets.html'">Tickets</button>
   </div>
   <div class="main">
-    <h2>Usuarios</h2>
-    <p>Página en construcción...</p>
+    <div class="card">
+      <h3 id="form-title">Crear usuario</h3>
+      <form id="usuarioForm">
+        <input type="hidden" name="id">
+        <label>Nombre completo</label>
+        <input name="nombre_completo" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Contraseña</label>
+        <input type="password" name="password">
+        <label>Rol</label>
+        <select name="rol">
+          <option value="tecnico">Técnico</option>
+          <option value="gestor">Gestor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" class="action edit">Guardar</button>
+      </form>
+    </div>
+    <div id="usuariosContainer"></div>
   </div>
 </div>
+
 <script>
+const API = location.origin;
+const container = document.getElementById("usuariosContainer");
+const form = document.getElementById("usuarioForm");
+
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
 }
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form).entries());
+  const method = data.id ? 'PUT' : 'POST';
+  const url = data.id ? `/usuarios/${data.id}` : '/usuarios';
+  await fetch(API + url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  form.reset();
+  document.getElementById("form-title").textContent = "Crear usuario";
+  cargarUsuarios();
+};
+
+async function cargarUsuarios() {
+  const res = await fetch(API + '/usuarios');
+  const usuarios = await res.json();
+  container.innerHTML = '';
+  usuarios.forEach(u => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${u.nombre_completo}</h3>
+      <p><strong>Email:</strong> ${u.email}</p>
+      <p><strong>Rol:</strong> ${u.rol}</p>
+      <button class="action edit" onclick='editar(${JSON.stringify(u)})'>✏️ Editar</button>
+      <button class="action delete" onclick='eliminar(${u.id})'>🗑️ Borrar</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function editar(u) {
+  form.id.value = u.id;
+  form.nombre_completo.value = u.nombre_completo;
+  form.email.value = u.email;
+  form.rol.value = u.rol;
+  document.getElementById("form-title").textContent = "Editar usuario";
+}
+
+async function eliminar(id) {
+  if (confirm("¿Borrar usuario?")) {
+    await fetch(API + '/usuarios/' + id, { method: 'DELETE' });
+    cargarUsuarios();
+  }
+}
+
+cargarUsuarios();
 </script>
 </body>
 </html>
