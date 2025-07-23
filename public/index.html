@@ -1,83 +1,40 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inicio - SAT</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 220px;
-      background-color: #2c3e50;
-      color: white;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    .sidebar h2 {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      padding: 10px 0;
-      display: block;
-      transition: background 0.2s;
-    }
-    .sidebar a:hover {
-      background-color: #34495e;
-      border-radius: 4px;
-    }
-    .main-content {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    header {
-      background-color: #0a3d62;
-      color: white;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      margin: -20px -20px 20px -20px;
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-      body {
-        flex-direction: column;
-      }
-      .main-content {
-        padding: 10px;
-      }
-    }
-  </style>
-</head>
-<body>
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
 
-  <div class="sidebar">
-    <h2>SAT Control</h2>
-    <a href="/index">Inicio</a>
-    <a href="/usuarios">Usuarios</a>
-    <a href="/clientes">Clientes</a>
-    <a href="/avisos">Avisos</a>
-    <a href="/tickets">Tickets</a>
-  </div>
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-  <div class="main-content">
-    <header>Inicio</header>
-    <h2>Bienvenido</h2>
-    <p>Selecciona una opción en el menú lateral.</p>
-  </div>
+// Servir archivos estáticos desde "public"
+app.use(express.static(path.join(__dirname, 'public')));
 
-</body>
-</html>
+// Rutas API (Backend)
+app.use('/avisos', require('./avisos'));
+app.use('/usuarios', require('./usuarios'));
+app.use('/clientes', require('./clientes'));
+app.use('/tickets', require('./tickets'));
+app.use('/auth', require('./auth')); // si lo usas
+
+// Rutas frontend amigables (Render no sirve /avisos.html sin esto)
+app.get('/avisos', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'avisos.html'));
+});
+app.get('/clientes', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'clientes.html'));
+});
+app.get('/usuarios', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'usuarios.html'));
+});
+app.get('/tickets', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'tickets.html'));
+});
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Puerto
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en puerto ${PORT}`);
+});
