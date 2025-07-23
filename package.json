@@ -1,5 +1,5 @@
 {
-  "name": "sat-backend",
+  "name": "sat-app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,8 +7,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
     "cors": "^2.8.5",
-    "bcryptjs": "^2.4.3"
+    "sqlite3": "^5.1.2"
   }
 }
