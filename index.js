@@ -29,3 +29,5 @@ app.use('/auth', require('./auth'));
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
+
+require('./crearAdmin')();
