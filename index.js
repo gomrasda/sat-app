@@ -34,3 +34,12 @@ require('./crearAdmin')();
 app.use('/auth', require('./auth'));
 app.use('/avisos', require('./avisos'));
 app.use('/usuarios', require('./usuarios'));
+
+<script>
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Si no hay token, redirige al login
+    location.href = 'login.html';
+  }
+</script>
+
