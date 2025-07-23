@@ -97,7 +97,15 @@
     }
     .actions .edit { background: #27ae60; color: white; }
     .actions .delete { background: #e74c3c; color: white; }
-    /* Modal */
+    .add-btn {
+      margin-bottom: 12px;
+      background: #2ecc71;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     #modal, #overlay {
       display: none;
       position: fixed;
@@ -136,13 +144,14 @@
       <button onclick="location.href='tickets.html'">Tickets</button>
     </div>
     <div class="main" id="usuariosContainer">
+      <button class="add-btn" onclick="abrirModalNuevo()">➕ Agregar Usuario</button>
       <!-- Cargado por JS -->
     </div>
   </div>
 
   <!-- Modal -->
   <div id="modal">
-    <h3>Editar Usuario</h3>
+    <h3 id="modal-title">Editar Usuario</h3>
     <input id="inputNombre" placeholder="Nombre" style="width:100%; margin-bottom:8px;" />
     <input id="inputUsuario" placeholder="Usuario" style="width:100%; margin-bottom:8px;" />
     <input id="inputEmail" placeholder="Email" style="width:100%; margin-bottom:8px;" />
@@ -157,6 +166,7 @@
 <script>
 const API = '';
 let usuarioActual = null;
+let esNuevo = false;
 
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -167,7 +177,7 @@ async function cargarUsuarios() {
   const res = await fetch(API + '/usuarios');
   const data = await res.json();
   const container = document.getElementById("usuariosContainer");
-  container.innerHTML = '';
+  container.querySelectorAll('.card').forEach(e => e.remove());
   data.forEach(u => {
     const div = document.createElement('div');
     div.className = 'card';
@@ -186,10 +196,24 @@ async function cargarUsuarios() {
 
 function abrirModal(usuario) {
   usuarioActual = usuario;
+  esNuevo = false;
+  document.getElementById("modal-title").innerText = "Editar Usuario";
   document.getElementById("inputNombre").value = usuario.nombre;
   document.getElementById("inputUsuario").value = usuario.usuario;
   document.getElementById("inputEmail").value = usuario.email;
   document.getElementById("inputRol").value = usuario.rol;
+  document.getElementById("modal").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
+}
+
+function abrirModalNuevo() {
+  usuarioActual = null;
+  esNuevo = true;
+  document.getElementById("modal-title").innerText = "Nuevo Usuario";
+  document.getElementById("inputNombre").value = "";
+  document.getElementById("inputUsuario").value = "";
+  document.getElementById("inputEmail").value = "";
+  document.getElementById("inputRol").value = "";
   document.getElementById("modal").style.display = "block";
   document.getElementById("overlay").style.display = "block";
 }
@@ -200,17 +224,26 @@ function cerrarModal() {
 }
 
 async function guardarCambios() {
-  const actualizado = {
+  const data = {
     nombre: document.getElementById("inputNombre").value,
     usuario: document.getElementById("inputUsuario").value,
     email: document.getElementById("inputEmail").value,
     rol: document.getElementById("inputRol").value
   };
-  await fetch('/usuarios/' + usuarioActual.id, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(actualizado)
-  });
+
+  if (esNuevo) {
+    await fetch('/usuarios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } else {
+    await fetch('/usuarios/' + usuarioActual.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
   cerrarModal();
   cargarUsuarios();
 }
