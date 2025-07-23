@@ -1,40 +1,110 @@
-const express = require('express');
-const path = require('path');
-const cors = require('cors');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inicio - SAT</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #0a3d62;
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .hamburguesa {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+    }
+    .sidebar {
+      width: 200px;
+      background: #343a40;
+      color: #fff;
+      padding: 15px;
+      display: none;
+      flex-direction: column;
+    }
+    .sidebar button {
+      background: none;
+      border: none;
+      color: #fff;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .sidebar button:hover {
+      background: #495057;
+    }
+    @media (min-width: 768px) {
+      .sidebar {
+        display: flex !important;
+      }
+      .hamburguesa {
+        display: none;
+      }
+    }
+    .main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .welcome-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="hamburguesa" onclick="toggleSidebar()">☰</button>
+    <h1>Inicio</h1>
+  </header>
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <h3>SAT Control</h3>
+      <button onclick="location.href='index.html'">Inicio</button>
+      <button onclick="location.href='usuarios.html'">Usuarios</button>
+      <button onclick="location.href='clientes.html'">Clientes</button>
+      <button onclick="location.href='avisos.html'">Avisos</button>
+      <button onclick="location.href='tickets.html'">Tickets</button>
+    </div>
+    <div class="main">
+      <div class="welcome-box">
+        <h2>Bienvenido a SAT Control</h2>
+        <p>Utiliza el menú lateral para gestionar avisos, usuarios, clientes y tickets.</p>
+      </div>
+    </div>
+  </div>
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Servir archivos estáticos desde "public"
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rutas API (Backend)
-app.use('/avisos', require('./avisos'));
-app.use('/usuarios', require('./usuarios'));
-app.use('/clientes', require('./clientes'));
-app.use('/tickets', require('./tickets'));
-app.use('/auth', require('./auth')); // si lo usas
-
-// Rutas frontend amigables (Render no sirve /avisos.html sin esto)
-app.get('/avisos', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'avisos.html'));
-});
-app.get('/clientes', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'clientes.html'));
-});
-app.get('/usuarios', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'usuarios.html'));
-});
-app.get('/tickets', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'tickets.html'));
-});
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Puerto
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`);
-});
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
+    }
+  </script>
+</body>
+</html>
