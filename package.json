@@ -11,3 +11,7 @@
     "sqlite3": "^5.1.2"
   }
 }
+
+"scripts": {
+  "crear-admin": "node crearAdmin.js"
+}
