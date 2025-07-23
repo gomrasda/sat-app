@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tickets - SAT</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f2f2f2; display: flex; flex-direction: column; height: 100vh; }
+    header { background: #0a3d62; color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+    header h1 { font-size: 18px; margin: 0; }
+    .hamburguesa { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+    .container { flex: 1; display: flex; flex-direction: row; }
+    .sidebar { width: 200px; background: #343a40; color: #fff; padding: 15px; display: none; flex-direction: column; }
+    .sidebar button { background: none; border: none; color: #fff; padding: 10px; text-align: left; cursor: pointer; }
+    .sidebar button:hover { background: #495057; }
+    @media (min-width: 768px) {
+      .sidebar { display: flex !important; }
+      .hamburguesa { display: none; }
+    }
+    .main { flex: 1; padding: 10px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+<header>
+  <button class="hamburguesa" onclick="toggleSidebar()">☰</button>
+  <h1>Tickets</h1>
+</header>
+<div class="container">
+  <div class="sidebar" id="sidebar">
+    <h3>SAT Control</h3>
+    <button onclick="location.href='index.html'">Inicio</button>
+    <button onclick="location.href='usuarios.html'">Usuarios</button>
+    <button onclick="location.href='clientes.html'">Clientes</button>
+    <button onclick="location.href='avisos.html'">Avisos</button>
+    <button onclick="location.href='tickets.html'">Tickets</button>
+  </div>
+  <div class="main">
+    <h2>Tickets</h2>
+    <p>Página en construcción...</p>
+  </div>
+</div>
+<script>
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
+}
+</script>
+</body>
+</html>
